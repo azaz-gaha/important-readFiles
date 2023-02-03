@@ -1,0 +1,86 @@
+ billingClient.querySkuDetailsAsync(params.build()) this method deprecated
+ billing library new update 5.0.0
+ step for library implementation
+
+ step 1:
+   add dependency in gradle
+   add internet permission on manifests
+
+ step 2 :
+  create list for  Product type
+  EX:   productlist = mutableListOf(
+                   Product.newBuilder()
+                       .setProductId("premium_monthly")
+                       .setProductType(BillingClient.ProductType.SUBS)
+                       .build(),
+                   Product.newBuilder()
+                       .setProductId("premium_quarterly")
+                       .setProductType(BillingClient.ProductType.SUBS)
+                       .build(),
+                   Product.newBuilder()
+                       .setProductId("premium_yearly")
+                       .setProductType(BillingClient.ProductType.SUBS)
+                       .build()
+
+               )
+        this list has two parameter  first get product id or string from play store
+        second for setType INAPP  or Subscribe
+
+
+step 3: create PurchaseUpdate object and listeners
+    EX :    var purchaseUpate= PurchasesUpdatedListener{
+                        billingResult, purchased ->
+                    Log.d("SGAGG", "onCreate: ${billingResult.toString()} (purchase )  $purchased")
+
+                }
+
+Step 4 : Create BillingClient Object for purchase listener register and start connection
+    EX :        billingClient = BillingClient.newBuilder(this)
+                    .enablePendingPurchases()
+                    .setListener(purchaseUpate)
+                    .build()
+
+step 5 : call billinClient.startConnection method and override 2 methods
+        1:onBillServiceDisconneted()
+        2:onBillingSetupFinish()
+        all initlize code write in second method
+
+step 6: all coode write in second method
+        step 6.1: create  $QueryProductDetailsParams.newBuilder()  this object for add type list
+         EX :     var mParm = QueryProductDetailsParams.newBuilder()
+                             mParm.setProductList(productlist)
+
+         step 6.2: override $billingClient.queryProductDetailsAsync() this method
+         EX :   billingClient.queryProductDetailsAsync(mParm.build(),object : ProductDetailsResponseListener {
+                                  override fun onProductDetailsResponse(
+                                      reuslt: BillingResult,
+                                      productDetails: MutableList<ProductDetails>
+                                  ) {}
+
+
+                     step 6.2.1 : queryProductDetailsAsync in write code
+                     first to get offerTokken
+                     EX :        productParamList  = ArrayList()
+                                                 for (data in productDetails) {
+                                                     var tokken = data.subscriptionOfferDetails?.get(0)?.offerToken
+
+                     step 6.2.2 create or add   $BillingFlowParams.ProductDetailsParams this library
+                     EX :       productParamList.add(
+                                                         BillingFlowParams.ProductDetailsParams.newBuilder()
+                                                             .setOfferToken(tokken.toString())
+                                                             .setProductDetails(data)
+                                                             .build()
+                                                     )
+        step 6.3 : create  BillingFlowParams.newBuilder() object and add list
+        EX :      bilinFlowParm = BillingFlowParams.newBuilder()
+                                         .setProductDetailsParamsList(productParamList)
+                                         .build()
+
+step 7: called $billingClient.launchBillingFlow(this,bilinFlowParm) this function show pop up
+for billing
+ EX :
+                var result = billingClient.launchBillingFlow(this,bilinFlowParm)
+
+
+
+Note : Full Demo In :: BillingMigrate App

@@ -1,0 +1,67 @@
+
+step for billing library use
+
+step 1
+ Add dependency from document
+
+    Step 1.1  arraylist add your products id from play console account
+    this id use for testing  "android.test.purchased"
+    EX:     var skiList = ArrayList<String>()
+                 skiList.add("android.test.purchased")
+
+ step 2: create PurchaseUpdateListener object to upate for user purchase or not
+    EX;    var purchasesUpdatedListener = PurchasesUpdatedListener{
+                   billingResult, purchase ->
+               }
+step 3: create BillingClient object
+    EX:   var biligClint = BillingClient.newBuilder(this)
+             .setListener(purchasesUpdatedListener)
+             .enablePendingPurchases().build()
+
+step 4: when user click buy item then start connection or startConnection method call
+ EX:  biligClint.startConnection(object : BillingClientStateListener {
+
+                  }
+
+        override 2 methods   1 disconnected() and setupfinished() all code write in second method
+        EX:   override fun onBillingServiceDisconnected() {
+                                Toast.makeText(this@MainActivity, "service disconnected", Toast.LENGTH_SHORT).show()
+
+                            }
+
+                             override fun onBillingSetupFinished(billingRes: BillingResult) {
+                             }
+
+step 5: After All code write in onBllingSetupFinished()
+
+       step 5.1 create SkuDetailsParams.newBuilder()  object because set billing type INApp or Subscription
+       EX :      val  params = SkuDetailsParams.newBuilder()
+                      params.setSkusList(skiList)
+                            .setType(BillingClient.SkuType.INAPP)
+
+       step 5.2  response send to this code
+       EX :    biligClint.querySkuDetailsAsync(params.build()) {
+                                        billingResult,skuDetailsList ->
+                                        run {
+
+                                            try {
+
+                                            for (skuDetail in skuDetailsList!!) {
+                                                var flowParams = BillingFlowParams.newBuilder()
+                                                    .setSkuDetails(skuDetail)
+                                                    .build()
+                                                var responseCode = biligClint.launchBillingFlow(
+                                                    this@MainActivity,
+                                                    flowParams
+                                                ).responseCode
+
+                                            }
+                                        }
+                                            catch (e:Exception)
+                                            {
+                                                Log.d("SGADVADF", e.message.toString())
+
+                                            }
+                                        }
+
+                                    }

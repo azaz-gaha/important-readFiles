@@ -1,0 +1,102 @@
+step for permisson get from user
+
+step 1 :
+check condition user have permisson or not
+like ::
+
+             if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+             == PackageManager.PERMISSION_GRANTED){
+                 startActivity(Intent(this,HomeActivity::class.java))
+            }
+             else
+             {
+                 takePermisson()
+             }
+
+step 2 :
+if user not have permisson and else is true
+else ma permission mate functino banavvu
+like ::
+
+          private fun takePermisson() {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED)
+                {
+                    Toast.makeText(this, "permisson granted in function ", Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    {
+                        AlertDialog.Builder(this)
+                            .setTitle("Warning !")
+                            .setMessage("please give the permission")
+                            .setPositiveButton("OK",object : DialogInterface.OnClickListener {
+                                override fun onClick(dialog: DialogInterface?, which: Int) {
+                                    ActivityCompat.requestPermissions(this@MainActivity, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),100)
+                                }
+                            }).show()
+
+                    }
+                    else
+                    {
+                        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),100)
+
+                    }
+                }
+
+            }
+step 3 :
+after user can give permission response in onRequestPermisson method
+like ::
+
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == 100)
+        {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+
+                binding.floatingActionButton.performClick()
+                Toast.makeText(this, "permission granted in onRequest function", Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                if(!ActivityCompat.shouldShowRequestPermissionRationale(this,android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                {
+                    AlertDialog.Builder(this)
+                        .setTitle("Alert !")
+                        .setMessage("aap ne permission deniea kar di hai setting me se open karna hoga")
+                        .setPositiveButton("YAH",object : DialogInterface.OnClickListener {
+                            override fun onClick(dialog: DialogInterface?, which: Int) {
+                                gotToSetting()
+                            }
+                        }).setNegativeButton("NO",object : DialogInterface.OnClickListener {
+                            override fun onClick(dialog: DialogInterface?, which: Int) {
+                                Toast.makeText(this@MainActivity, "sorry i never trusted you ", Toast.LENGTH_SHORT).show()
+                            }
+                        }).show()
+                }
+                else
+                {
+                    takePermisson()
+                }
+
+            }
+        }
+
+    }
+
+step 4::
+if permisson denie than called this function on onRequestPermisson
+like ::
+    private  fun gotToSetting()
+    {
+        val intent = Intent()
+        intent.action  = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        var uri = Uri.fromParts("package",this.packageName,null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+ check may be complete get user permisson methods

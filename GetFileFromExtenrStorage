@@ -1,0 +1,48 @@
+steps for external storage get image file or folder
+
+step 1:
+    first make url which type data get
+like :: image data get
+        var uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+step 2 :
+        create projection means which type column you want to get
+
+        MediaStore.Images.ImageColumns.TITLE
+        user can get image title
+        like array means projection
+like ::
+    var projection = arrayOf(
+            MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.BUCKET_ID,
+            MediaStore.Images.ImageColumns.DISPLAY_NAME, MediaStore.Images.ImageColumns.TITLE
+        )
+
+ step 3:: create cursor and contentMethod.query method insert like
+ like::
+         var cursor = contentResolver.query(uri, projection, null, null, null)
+
+step 4 :: now check curse movetoNext method in if condintion and in while condition
+loop in get all data store in list or array
+
+like ::
+      if (cursor!!.moveToFirst()) {
+            while (cursor!!.moveToNext()) {
+                var data = cursor!!.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA)
+                var image = cursor.getString(data)
+                Log.d("DHFSD", "getAllFolders: " + image)
+                tempList.add(image)
+            }
+
+        }
+
+may be run successfully complete get all images
+
+
+
+
+//note
+        first get read write permisson and declare in manifeist
+//note
+        im mamifeast add permisoon in <application tag in
+        android:requestLegacyExternalStorage="true"
+
